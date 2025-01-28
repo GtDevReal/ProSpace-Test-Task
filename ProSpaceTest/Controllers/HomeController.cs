@@ -1,10 +1,10 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProSpaceTest.Models;
+using System.Diagnostics;
 
 namespace ProSpaceTest.Controllers
 {
-    public class HomeController : Controller
+	public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
 
