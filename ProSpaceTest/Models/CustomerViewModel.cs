@@ -1,4 +1,6 @@
-﻿namespace ProSpaceTest.Models
+﻿using ProSpaceTest.Data.Entity;
+
+namespace ProSpaceTest.Models
 {
 	public class CustomerViewModel
 	{

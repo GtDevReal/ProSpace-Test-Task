@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using ProSpaceTest.Models;
 using System.Data;
 
 namespace ProSpaceTest
@@ -9,7 +10,7 @@ namespace ProSpaceTest
 		public static async Task InitializeRoles(IServiceProvider serviceProvider)
 		{
 			var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-			var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+			var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
 			string[] roles = { "Manager", "Customer" };
 
@@ -25,7 +26,7 @@ namespace ProSpaceTest
 			var adminPassword = "Admin_123";
 			if (await userManager.FindByEmailAsync(adminEmail) == null)
 			{
-				var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true, NormalizedEmail = adminEmail.ToUpper(), NormalizedUserName = adminEmail.ToUpper() };
+				var admin = new User { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true, NormalizedEmail = adminEmail.ToUpper(), NormalizedUserName = adminEmail.ToUpper() };
 				IdentityResult result = await userManager.CreateAsync(admin, adminPassword);
 				if (result.Succeeded)
 				{

@@ -1,4 +1,4 @@
-﻿namespace ProSpaceTest.Models
+﻿namespace ProSpaceTest.Areas.Manager.Models
 {
 	public class ProductViewModel
 	{

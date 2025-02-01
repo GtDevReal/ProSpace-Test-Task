@@ -1,40 +1,52 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<User> SignInManager
 
-<ul class="navbar-nav">
-	@if (SignInManager.IsSignedIn(User))
-	{
-		<li class="nav-item dropdown">
-			<a class="nav-link dropdown-toggle" asp-area="Identity" asp-page="/Account/Manage/Index" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-				@User.Identity?.Name
-			</a>
+<div id="app">
+	<ul class="navbar-nav">
+		@if (SignInManager.IsSignedIn(User))
+		{
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					@User.Identity?.Name
+				</a>
 			<ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-			<li>
-				<p class="dropdown-item mb-0" style="margin-left: 8px">
-					Ваши роли:
-					@foreach (var item in User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList())
-					{
-						<br />
-						@item
-					}
-				</p>
-			</li>
-			<li>
-				<form class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-					<button type="submit" class="nav-link btn btn-link text-dark text-start">Выход</button>
-				</form>
-			</li>
-		</ul>
-	</li>
-}
-else
-{
-	<li class="nav-item">
-		<a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Зарегистрироваться</a>
-	</li>
-	<li class="nav-item">
-		<a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Войти</a>
-	</li>
-}
-</ul>
+				<li>
+					<p class="dropdown-item mb-0" style="margin-left: 8px">
+						Ваши роли:
+						@foreach (var item in User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList())
+						{
+							<br />
+							@item
+						}
+					</p>
+				</li>
+				<li>
+					<div class="dropdown-item">
+						<button type="submit" class="nav-link btn btn-link text-dark text-start" v-on:click="openModal">Выход</button>
+					</div>
+				</li>
+			</ul>
+		</li>
+	}
+	</ul>
+
+	<div class="modal fade" :class="{ 'show d-block': isModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Выход</h5>
+					<button type="button" class="btn-close" v-on:click="closeModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					Вы действительно хотите выйти?
+				</div>
+				<div class="modal-footer">
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-secondary" v-on:click="logout">Выйти из аккаунта</button>
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isModalOpen, 'd-none': !isModalOpen }"></div>
+</div>
+

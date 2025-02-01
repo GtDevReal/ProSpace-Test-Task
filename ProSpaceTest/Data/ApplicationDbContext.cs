@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProSpaceTest.Data.Entity;
+using ProSpaceTest.Models;
 
 namespace ProSpaceTest.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+	public class ApplicationDbContext : IdentityDbContext<User>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+		public DbSet<ProductEntity> Products { get; set; }
+		public DbSet<OrderEntity> Orders { get; set; }
+		public DbSet<OrderItemEntity> OrderItems { get; set; }
+		public DbSet<CustomerEntity> Customers { get; set; }
+
+		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
 			Database.EnsureCreated();
