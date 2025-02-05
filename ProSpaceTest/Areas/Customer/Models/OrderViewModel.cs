@@ -1,6 +1,6 @@
-﻿namespace ProSpaceTest.Data.Entity
+﻿namespace ProSpaceTest.Areas.Customer.Models
 {
-	public class OrderEntity
+	public class OrderViewModel
 	{
 		public Guid Id { get; set; }
 		public Guid CustomerId { get; set; }
@@ -9,7 +9,6 @@
 		public int? OrderNumber { get; set; }
 		public string? Status { get; set; }
 
-		public CustomerEntity Customer { get; set; }
-		public List<OrderItemEntity> Items { get; set; }
+		public List<OrderItemViewModel> Items { get; set; }
 	}
 }

@@ -1,4 +1,26 @@
 ﻿@{
-    ViewData["TItle"] = "Индекс";
+    ViewData["TItle"] = "Панель управления";
 }
-<h1>Страница заказчика</h1>
+
+<div class="container p-0 mt-4">
+	<div class="row">
+		<div class="col-sm-6 mb-3 mb-sm-0">
+			<div class="card" style="height: 180px">
+				<div class="card-body">
+					<h5 class="card-title">Каталог товаров</h5>
+					<p class="card-text">На странице каталога вам будет предоставлен список товаров, вы можете выбрать нужные и создать заказ</p>
+					<a href="@Url.Action("Index", "Catalog", new { area = "Customer" })" class="btn btn-primary">Перейти</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="card" style="height: 180px">
+				<div class="card-body">
+					<h5 class="card-title">Заказы</h5>
+					<p class="card-text">На странице заказов, вы можете отслеживать свои заказы </p>
+					<a href="#" class="btn btn-primary">Перейти</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

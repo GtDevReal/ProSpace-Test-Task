@@ -1,25 +1,52 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using ProSpaceTest.Areas.Manager.Models;
+using ProSpaceTest.Data.Entity;
 using ProSpaceTest.Data.Interfaces;
-using ProSpaceTest.Data.Repositories;
-using ProSpaceTest.Infrastructure;
 
 namespace ProSpaceTest.Areas.Manager.Controllers
 {
+	[Route("Products")]
 	public class ProductsController : _AreaBaseController
 	{
 		private readonly IUnitOfWork _unitOfWork;
-		private IConverterHelper _converterHelper = null;
+		private readonly IMapper _mapper;
 
-		public ProductsController(IUnitOfWork unitOfWork, IConverterHelper converterHelper)
+		public ProductsController(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			_unitOfWork = unitOfWork;
-			_converterHelper = converterHelper;
+			_mapper = mapper;
 		}
 
-		[Route("product/a")]
+		public IActionResult Index()
+		{
+			return View();
+		}
+
+		[Route("l")]
+		[HttpGet]
+		public async Task<IActionResult> GetProductsList()
+		{
+			var models = new List<ProductViewModel>();
+
+			try
+			{
+				var products = await _unitOfWork.Products.GetAllAsync();
+				if (products != null)
+				{
+					models = products.Select(m => _mapper.Map<ProductViewModel>(m)).ToList();
+					return Ok(models);
+				}
+				return NoContent();
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[Route("a")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddProduct([FromBody] ProductViewModel model)
@@ -31,7 +58,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 				{
 					try
 					{
-						var entity = _converterHelper.BuildProductEntity(model);
+						var entity = _mapper.Map<ProductEntity>(model);
 						await _unitOfWork.Products.CreateAsync(entity);
 						await _unitOfWork.SaveChangesAsync();
 						return Ok("Успешно!");
@@ -51,7 +78,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 			return BadRequest();
 		}
 
-		[Route("product/i/{id:guid}")]
+		[Route("i/{id:guid}")]
 		[HttpGet]
 		public async Task<IActionResult> GetInfo(Guid id)
 		{
@@ -62,7 +89,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 					var entity = await _unitOfWork.Products.GetByIdAsync(id);
 					if (entity != null)
 					{
-						var model = _converterHelper.BuildProductViewModel(entity);
+						var model = _mapper.Map<ProductViewModel>(entity);
 						return Ok(model);
 					}
 					return NoContent();
@@ -76,7 +103,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 			return BadRequest("Запрос пустой!");
 		}
 
-		[Route("product/e/")]
+		[Route("e")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> EditProduct([FromBody] ProductViewModel model)
@@ -87,7 +114,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 				{
 					try
 					{
-						var entity = _converterHelper.BuildProductEntity(model);
+						var entity = _mapper.Map<ProductEntity>(model);
 						_unitOfWork.Products.Update(entity);
 						await _unitOfWork.SaveChangesAsync();
 						return Ok("Успешно!");
@@ -107,7 +134,7 @@ namespace ProSpaceTest.Areas.Manager.Controllers
 			return BadRequest();
 		}
 
-		[Route("product/d/{id:guid}")]
+		[Route("d/{id:guid}")]
 		[HttpDelete]
 		public async Task<IActionResult> DeleteProduct(Guid id)
 		{

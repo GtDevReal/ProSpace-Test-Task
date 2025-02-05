@@ -4,6 +4,8 @@
 			isErrorModalOpen: false,
 			isCreateModalOpen: false,
 			isDeleteModalOpen: false,
+			isInfoModalOpen: false,
+			infoMessage: '',
 			deleteGuid: '',
 			products: [],
 			categories: [],
@@ -43,7 +45,7 @@
 		},
 		filteredProducts() {
 			let filtered = this.products;
-
+			this.pageNumber = 0;
 			// Фильтрация по категории
 			if (this.productFilters.category) {
 				filtered = filtered.filter(product => product.category.toLowerCase() === this.productFilters.category.toLowerCase());
@@ -87,7 +89,7 @@
 	},
 	methods: {
 		async getProductList() {
-			var url = '/dash/p';
+			var url = '/products/l';
 			try {
 				var response = await axios.get(url);
 
@@ -131,7 +133,7 @@
 
 			if (this.productModel.id != '' && this.productModel.id != null) {
 				try {
-					var url = "/product/e"
+					var url = "/products/e"
 					var token = $("input[name = '__RequestVerificationToken']").val()
 					var response = await axios.post(url, this.productModel, {
 						headers: {
@@ -142,6 +144,8 @@
 					if (response.status == 200) {
 						this.productModel = { id: '', code: '', name: '', price: 0, category: '' };
 						this.closeCreateProductModal();
+						this.openInfoModal();
+						this.infoMessage = "Запись успешно отредактирована!";
 						this.$forceUpdate();
 						this.getProductList();
 					}
@@ -158,7 +162,7 @@
 				try {
 					const { id, ...productCreate } = this.productModel;
 
-					var url = "/product/a"
+					var url = "/products/a"
 					var token = $("input[name = '__RequestVerificationToken']").val()
 					var response = await axios.post(url, productCreate, {
 						headers: {
@@ -169,6 +173,8 @@
 					if (response.status == 200) {
 						this.productModel = { code: '', name: '', price: 0, category: '' };
 						this.closeCreateProductModal();
+						this.openInfoModal();
+						this.infoMessage = "Запись успешно сохранена!";
 						this.$forceUpdate();
 						this.getProductList();
 					}
@@ -224,6 +230,7 @@
 				sortBy: 'name',
 				sortDirection: 'asc',
 			};
+			this.pageNumber = 0;
 			this.getProductList();
 		},
 		setSort(sortBy, sortDirection) {
@@ -233,7 +240,7 @@
 		async getProductInfo(id) {
 			try {
 				this.productModel = { id: '', code: '', name: '', price: 0, category: '' };
-				var url = `/product/i/${id}`
+				var url = `/products/i/${id}`
 				var response = await axios.get(url);
 				if (response.status != 200) {
 					this.showModalError(response)
@@ -265,10 +272,12 @@
 		async deleteProduct(id) {
 			try {
 				this.closeDeleteModal();
-				var url = `/product/d/${id}`;
+				var url = `/products/d/${id}`;
 				var response = await axios.delete(url);
 				if (response.status == 200) {
 					this.deleteGuid = '';
+					this.openInfoModal();
+					this.infoMessage = "Запись успешно удалена!";
 					this.$forceUpdate();
 					this.getProductList();
 				}
@@ -279,10 +288,16 @@
 			catch (e) {
 				this.showModalError(e);
 			}
+		},
+		closeInfoModal() {
+			this.isInfoModalOpen = false;
+		},
+		openInfoModal() {
+			this.isInfoModalOpen = true;
 		}
 	},
 	beforeMount() {
 		this.getProductList();
 	}
 })
-list.mount('#dash');
+list.mount('#products');

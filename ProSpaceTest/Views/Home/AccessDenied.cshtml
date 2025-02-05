@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Доступ запрещен";
+}
+
+<div class="container mt-4">
+    @if (User.IsInRole("Customer"))
+    {
+        <div class="alert alert-warning" role="alert">
+            Вы перешли на страницу, к которой у вас нет доступа! <a class="alert-link" href="/Customer">Вернуться на стартовую страницу</a>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            Вы перешли на страницу, к которой у вас нет доступа! <a class="alert-link" href="/Manager">Вернуться на стартовую страницу</a>
+        </div>
+    }
+</div>

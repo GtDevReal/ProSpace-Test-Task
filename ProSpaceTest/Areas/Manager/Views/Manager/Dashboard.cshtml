@@ -1,213 +1,35 @@
 ﻿@{
-	ViewData["TItle"] = "Дашборд";
+	ViewData["TItle"] = "Дэшборд";
 }
 
-@section Scripts{
-	<script src="/manager/scripts/product.list.js"></script>
-}
-
-<div class="container p-0 mt-4" id="dash">
-	<ul class="nav nav-tabs" id="myTab" role="tablist">
-		<li class="nav-item" role="presentation">
-			<button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="home" aria-selected="true">Управление каталогом</button>
-		</li>
-		<li class="nav-item" role="presentation">
-			<button class="nav-link" id="customer-tab" data-bs-toggle="tab" data-bs-target="#customer" type="button" role="tab" aria-controls="profile" aria-selected="false">Управление пользователями</button>
-		</li>
-		<li class="nav-item" role="presentation">
-			<button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="contact" aria-selected="false">Управление заказами</button>
-		</li>
-	</ul>
-
-	<!-- Контент вкладок -->
-	<div class="tab-content border p-1" style="padding: 0 2rem 0 2rem !important" id="myTabContent">
-		<div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="home-tab">
-
-
-			<div class="alert alert-warning mt-3" v-if="products.length == 0 && errorMessage.length == 0" role="alert">
-				В системе не найдено продуктов! <a href="#" v-on:click="openCreateProductModal" class="alert-link">Добавить?</a>
-			</div>
-			<div v-if="paginatedData.length != 0">
-				<nav class="navbar navbar-expand-lg" >
-					<div class="container-fluid p-0">
-						<div class="collapse navbar-collapse" id="navbarSupportedContent">
-							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-								<li class="nav-item dropdown">
-									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Фильтрация по категории
-									</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a class="dropdown-item" href="#" v-on:click="productFilters.category = '' ">Все категории</a>
-										</li>
-										<li v-for="category in categories" :value="category">
-											<a class="dropdown-item" href="#" v-on:click="productFilters.category = category">{{ category }}</a>
-										</li>
-									</ul>
-								</li>
-								<li class="nav-item dropdown">
-									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Сортировка
-									</a>
-									<ul class="dropdown-menu">
-										<li>
-											<a class="dropdown-item" href="#" v-on:click ="setSort('name', 'asc')">По имени (А-Я)</a>
-										</li>
-										<li>
-											<a class="dropdown-item" href="#" v-on:click="setSort('name', 'desc')">По имени (Я-А)</a>
-										</li>
-										<li>
-											<a class="dropdown-item" href="#" v-on:click="setSort('price', 'asc')">По цене (по возрастанию)</a>
-										</li>
-										<li>
-											<a class="dropdown-item" href="#" v-on:click="setSort('price', 'desc')">По цене (по убыванию)</a>
-										</li>
-									</ul>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="#" v-on:click="resetProductFilters">Сбросить фильтры</a>
-								</li>
-							</ul>
-							<input class="btn btn-primary mt-3 mb-3" type="button" v-on:click="openCreateProductModal" value="Создать запись">
-						</div>
-					</div>
-				</nav>
-				<div class="row row-cols-3 row-cols-md-3 g-4 mb-4">
-					<div class="col" v-for="product in paginatedData" :key="product.id">
-						<div class="card">
-							<div class="card-body">
-								<h5 class="card-title">Наименование: {{product.name}}</h5>
-								<h6 class="card-subtitle mb-2 text-body-secondary">Код товара: {{product.code}}</h6>
-								<p class="card-text">Категория: {{product.category}}</p>
-								<p class="card-text">Стоимость: {{product.price}}</p>
-								<div class="card-body d-flex justify-content-around">
-									<a href="#" class="btn btn-primary" v-on:click.prevent="getProductInfo(product.id)">Редактировать</a>
-									<a href="#" class="btn btn-primary" v-on:click.prevent="deleteConfirm(product.id)">Удалить</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="d-flex justify-content-between align-items-center" :class="{ 'd-none': paginatedData.length == 0 }">
-					<p class="me-auto">Страница {{ pageNumber + 1 }} из {{ pageCount }}</p>
-					<nav class="">
-						<ul class="pagination justify-content-center">
-							<li class="page-item" style="margin-right: 1rem">
-								<button class="btn btn-primary page-link" v-on:click="previousPage" :disabled="pageNumber === 0">Назад</button>
-							</li>
-							<li class="page-item" >
-								<button class="btn btn-primary page-link" v-on:click="nextPage" :disabled="pageNumber >= pageCount - 1">Вперёд</button>
-							</li>
-						</ul>
-					</nav>
+<div class="container p-0 mt-4">
+	<div class="row">
+		<div class="col-sm-4 mb-3 mb-sm-0">
+			<div class="card" style="height: 250px">
+				<div class="card-body">
+					<h5 class="card-title">Управление каталогом</h5>
+					<p class="card-text">На странице управления каталогом, вы можете полностью управлять созданными в системе товарами, а также создавать новые</p>
+					<a href="@Url.Action("Index", "Products", new { area = "Manager" })" class="btn btn-primary">Перейти</a>
 				</div>
 			</div>
 		</div>
-
-
-
-		<div class="tab-pane fade" id="customer" role="tabpanel" aria-labelledby="profile-tab">
-			<h3 class="mt-3">Profile Content</h3>
-			<p>This is the profile tab content.</p>
-		</div>
-
-
-
-		<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="contact-tab">
-			<h3 class="mt-3">Contact Content</h3>
-			<p>This is the contact tab content.</p>
-		</div>
-	</div>
-
-
-
-	<!--Модальное окно создания и редактирования продукта-->
-	<div class="modal fade" :class="{ 'show d-block': isCreateModalOpen }" data-bs-backdrop="static">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 align="center" class="modal-title">Создания продукта</h5>
-					<button type="button" class="btn-close" v-on:click="closeCreateProductModal" aria-label="Close"></button>
+		<div class="col-sm-4">
+			<div class="card" style="height: 250px">
+				<div class="card-body">
+					<h5 class="card-title">Управление пользователями</h5>
+					<p class="card-text">На странице управления пользователями, вы можете полностью управлять созданными аккаунтами пользователей, организациями, а также создавать новые</p>
+					<a href="@Url.Action("Index", "Distributors", new { area = "Manager" })" class="btn btn-primary">Перейти</a>
 				</div>
-				<div class="modal-body">
-					<form id="product-form">
-						@Html.AntiForgeryToken()
-						<input type="hidden" v-model="productModel.id"/>
-						<div class="row g-2">
-							<label>Код товара</label>
-							<div class="col-auto" style="width: 60% !important;">
-								<input type="text" class="form-control" v-model="productModel.code" id="code" placeholder="XX-XXXX-YYXX" disabled required>
-							</div>
-							<div class="col-auto">
-								<input type="button" class="btn btn-primary" v-on:click="generateCode" value="Сгенерировать код" />
-							</div>
-							<span v-if="errorsProduct.code" class="text-danger">{{errorsProduct.code}}</span>
-							<div class="col-12">
-								<label class="form-label">Наименование</label>
-								<input id="name" v-model="productModel.name" type="text" class="form-control" aria-required="true" required />
-								<span v-if="errorsProduct.name" class="text-danger">{{errorsProduct.name}}</span>
-							</div>
-							<div class="col-12">
-								<label class="form-label">Категория</label>
-								<input id="category" v-model="productModel.category" type="text" class="form-control" aria-required="true" required />
-								<span v-if="errorsProduct.category" class="text-danger">{{errorsProduct.category}}</span>
-							</div>
-							<div class="col-12">
-								<label class="form-label">Стоимость</label>
-								<input id="price" v-model="productModel.price" type="text" class="form-control" aria-required="true" required />
-								<span v-if="errorsProduct.price" class="text-danger">{{errorsProduct.price}}</span>
-							</div>
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-secondary" v-on:click="createProduct">Сохранить</button>
-					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeCreateProductModal">Закрыть</button>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="card" style="height: 250px">
+				<div class="card-body">
+					<h5 class="card-title">Управление заказами</h5>
+					<p class="card-text">На странице управления заказами, вы можете управлять заказами, которые создали пользователи</p>
+					<a href="#" class="btn btn-primary">Перейти</a>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="modal-backdrop fade" :class="{ 'show': isCreateModalOpen, 'd-none': !isCreateModalOpen }"></div>
-	<!--Модальное окно создания и редактирования продукта-->
-
-	<!--Модальное окно ошибок-->
-	<div class="modal fade" :class="{ 'show d-block': isErrorModalOpen }" data-bs-backdrop="static">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 align="center" class="modal-title">Выход</h5>
-					<button type="button" class="btn-close" v-on:click="closeErrorModal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					{{errorMessage}}
-				</div>
-				<div class="modal-footer">
-					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeErrorModal">Закрыть</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal-backdrop fade" :class="{ 'show': isErrorModalOpen, 'd-none': !isErrorModalOpen }"></div>
-	<!--Модальное окно ошибок-->
-
-	<!--Модальное окно удаления-->
-	<div class="modal fade" :class="{ 'show d-block': isDeleteModalOpen }" data-bs-backdrop="static">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 align="center" class="modal-title">Выход</h5>
-					<button type="button" class="btn-close" v-on:click="closeDeleteModal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					Вы действительно хотите удалить эту запись?
-				</div>
-				<div class="modal-footer">
-					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-secondary" v-on:click="deleteProduct(deleteGuid)">Удалить</button>
-					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeDeleteModal">Закрыть</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal-backdrop fade" :class="{ 'show': isDeleteModalOpen, 'd-none': !isDeleteModalOpen }"></div>
-	<!--Модальное окно удаления-->
 </div>

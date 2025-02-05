@@ -2,10 +2,9 @@
 
 namespace ProSpaceTest.Areas.Customer.Controllers
 {
-	[Route("Customer")]
-	public class CustomerController : _AreaBaseController
+	[Route("orders")]
+	public class OrdersController : _AreaBaseController
 	{
-
 		public IActionResult Index()
 		{
 			return View();

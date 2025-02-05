@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProSpaceTest.Data.Entity;
 using ProSpaceTest.Data.Interfaces;
-using SQLitePCL;
 
 namespace ProSpaceTest.Data.Repositories
 {
@@ -15,27 +14,69 @@ namespace ProSpaceTest.Data.Repositories
 
 		public async Task CreateAsync(ProductEntity entity)
 		{
-			await _context.Products.AddAsync(entity);
+			try
+			{
+				await _context.Products.AddAsync(entity);
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
 		}
 
 		public async Task<IEnumerable<ProductEntity>> GetAllAsync()
 		{
-			return await _context.Products.ToListAsync();
+			try
+			{
+				return await _context.Products.ToListAsync();
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
 		}
 
 		public async Task<ProductEntity> GetByIdAsync(Guid id)
 		{
-			return await _context.Products.FirstOrDefaultAsync(entity => entity.Id == id);
+			try
+			{
+				return await _context.Products.FirstOrDefaultAsync(entity => entity.Id == id);
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
 		}
 
 		public void Update(ProductEntity entity)
 		{
-			_context.Products.Update(entity);
+			try
+			{
+				_context.Products.Update(entity);
+
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}		
 		}
 
 		public void Delete(ProductEntity entity)
 		{
-			_context.Products.Remove(entity);
+			try
+			{
+				_context.Products.Remove(entity);
+
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}		
 		}
 	}
 }

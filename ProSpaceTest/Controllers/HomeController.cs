@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
+using ProSpaceTest.Data.Entity;
 using ProSpaceTest.Models;
 using System.Diagnostics;
 
@@ -8,9 +8,9 @@ namespace ProSpaceTest.Controllers
 {
 	public class HomeController : Controller
     {
-		private SignInManager<User> _signInManager;
+		private SignInManager<UsersEntity> _signInManager;
 
-		public HomeController(SignInManager<User> signInManager)
+		public HomeController(SignInManager<UsersEntity> signInManager)
 		{
 			_signInManager = signInManager;
 		}
@@ -59,6 +59,12 @@ namespace ProSpaceTest.Controllers
 			{
 				return BadRequest("Данные введены некорректно!");
 			}
+		}
+
+		[Route("Denied")]
+		public IActionResult AccessDenied()
+		{
+			return View();
 		}
 
 		[HttpPost]

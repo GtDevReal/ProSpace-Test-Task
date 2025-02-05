@@ -165,14 +165,13 @@ namespace ProSpaceTest.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<float>("Discount")
+                    b.Property<float?>("Discount")
                         .HasColumnType("real");
 
                     b.Property<string>("Name")
@@ -181,7 +180,7 @@ namespace ProSpaceTest.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("ProSpaceTest.Data.Entity.OrderEntity", b =>
@@ -193,22 +192,26 @@ namespace ProSpaceTest.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("OrderDate")
+                        .HasColumnType("date");
 
-                    b.Property<int>("OrderNumber")
+                    b.Property<int?>("OrderNumber")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("ShipmentDate")
-                        .HasColumnType("timestamp with time zone");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("OrderNumber"));
+
+                    b.Property<DateOnly?>("ShipmentDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders", (string)null);
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("ProSpaceTest.Data.Entity.OrderItemEntity", b =>
@@ -231,7 +234,9 @@ namespace ProSpaceTest.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("ProSpaceTest.Data.Entity.ProductEntity", b =>
@@ -241,26 +246,25 @@ namespace ProSpaceTest.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<float>("Price")
+                    b.Property<float?>("Price")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ProSpaceTest.Models.User", b =>
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.UsersEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -317,6 +321,8 @@ namespace ProSpaceTest.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -338,7 +344,7 @@ namespace ProSpaceTest.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ProSpaceTest.Models.User", null)
+                    b.HasOne("ProSpaceTest.Data.Entity.UsersEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -347,7 +353,7 @@ namespace ProSpaceTest.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ProSpaceTest.Models.User", null)
+                    b.HasOne("ProSpaceTest.Data.Entity.UsersEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -362,7 +368,7 @@ namespace ProSpaceTest.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProSpaceTest.Models.User", null)
+                    b.HasOne("ProSpaceTest.Data.Entity.UsersEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -371,11 +377,55 @@ namespace ProSpaceTest.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ProSpaceTest.Models.User", null)
+                    b.HasOne("ProSpaceTest.Data.Entity.UsersEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.OrderEntity", b =>
+                {
+                    b.HasOne("ProSpaceTest.Data.Entity.CustomerEntity", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.OrderItemEntity", b =>
+                {
+                    b.HasOne("ProSpaceTest.Data.Entity.OrderEntity", "Order")
+                        .WithMany("Items")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.UsersEntity", b =>
+                {
+                    b.HasOne("ProSpaceTest.Data.Entity.CustomerEntity", "Customer")
+                        .WithMany("Users")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.CustomerEntity", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ProSpaceTest.Data.Entity.OrderEntity", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

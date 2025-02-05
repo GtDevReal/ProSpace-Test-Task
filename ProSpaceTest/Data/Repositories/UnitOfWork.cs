@@ -1,19 +1,30 @@
-﻿using ProSpaceTest.Data.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using ProSpaceTest.Data.Entity;
+using ProSpaceTest.Data.Interfaces;
 
 namespace ProSpaceTest.Data.Repositories
 {
 	public class UnitOfWork : IUnitOfWork
 	{
 		private readonly ApplicationDbContext _context;
+		private readonly UserManager<UsersEntity> _userManager;
 		private bool _disposed = false;
 
-		public UnitOfWork(ApplicationDbContext context)
+		public IProductsRepository Products { get; set; }
+		public ICustomersRepository Customers { get; set; }
+		public IUsersRepository AspNetUsers { get; set; }
+		public IOrderRepository Orders { get; set; }
+
+		public UnitOfWork(ApplicationDbContext context, UserManager<UsersEntity> userManager)
 		{
 			_context = context;
-			Products = new ProductsRepository(_context);
-		}
+			_userManager = userManager;
 
-		public IProductsRepository Products { get; set; }
+			Orders = new OrderRepository(_context);
+			Products = new ProductsRepository(_context);
+			Customers = new CustomersRepository(_context);
+			AspNetUsers = new UsersRepository(_context, _userManager);
+		}
 
 		public async Task<int> SaveChangesAsync()
 		{

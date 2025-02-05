@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 using ProSpaceTest;
+using ProSpaceTest.Areas.Customer.Mapper;
+using ProSpaceTest.Areas.Manager.Mapper;
 using ProSpaceTest.Data;
+using ProSpaceTest.Data.Entity;
 using ProSpaceTest.Data.Interfaces;
 using ProSpaceTest.Data.Repositories;
-using ProSpaceTest.Infrastructure;
-using ProSpaceTest.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<UsersEntity>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
@@ -46,6 +46,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Home/Index";
     options.LogoutPath = "/Home/Logout";
+	options.AccessDeniedPath = "/Denied";
 });
 
 builder.Services.AddAntiforgery(opt =>
@@ -53,9 +54,8 @@ builder.Services.AddAntiforgery(opt =>
     opt.HeaderName = "RequestVerificationToken";
 });
 
-
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IConverterHelper, ConverterHelper>();
+builder.Services.AddAutoMapper(typeof(ManagerMapperProfile), typeof(CustomerMapperProfile));
 
 var app = builder.Build();
 
@@ -104,12 +104,12 @@ app.UseAuthorization();
 app.MapAreaControllerRoute(
     name: "Manager",
     areaName: "Manager",
-    pattern: "{controller=Manager}/{action=Dashboard}");
+    pattern: "/Manager/{controller=Manager}/{action=Dashboard}");
 
 app.MapAreaControllerRoute(
 	name: "Customer",
 	areaName: "Customer",
-	pattern: "{controller=Customer}/{action=Index}");
+	pattern: "/Customer/{controller=Customer}/{action=Index}");
 
 app.MapControllerRoute(
     name: "default",

@@ -1,0 +1,157 @@
+﻿@{
+	ViewData["TItle"] = "Каталог";
+}
+
+@section Scripts {
+	<script src="/customer/scripts/products.shop.js" asp-append-version="true"></script>
+}
+
+<nav style="--bs-breadcrumb-divider: '>'" class="mt-2" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Панель управления</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Каталог</li>
+	</ol>
+</nav>
+<div class="container p-0 mt-4" id="orders">
+	<div class="alert alert-info alert-dismissible fade show" role="alert">
+		При увеличения количества товара, он автоматически добавляется в корзину. При обновлении страницы, товары не сохраняются!
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+	</div>
+	<div class="tab-content border p-1" style="padding: 0 2rem 0 2rem !important" id="myTabContent">
+		<div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
+			<nav class="navbar navbar-expand-lg">
+				<div class="container-fluid p-0">
+					<div class="collapse navbar-collapse" id="navbarSupportedContent">
+						<ul class="navbar-nav me-auto mb-2 mb-lg-0 w-75">
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Фильтрация по категории
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a class="dropdown-item" href="#" v-on:click="productFilters.category = '' ">Все категории</a>
+									</li>
+									<li v-for="category in categories" :value="category">
+										<a class="dropdown-item" href="#" v-on:click="productFilters.category = category">{{ category }}</a>
+									</li>
+								</ul>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Сортировка
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a class="dropdown-item" href="#" v-on:click="setSort('name', 'asc')">По имени (А-Я)</a>
+									</li>
+									<li>
+										<a class="dropdown-item" href="#" v-on:click="setSort('name', 'desc')">По имени (Я-А)</a>
+									</li>
+									<li>
+										<a class="dropdown-item" href="#" v-on:click="setSort('price', 'asc')">По цене (по возрастанию)</a>
+									</li>
+									<li>
+										<a class="dropdown-item" href="#" v-on:click="setSort('price', 'desc')">По цене (по убыванию)</a>
+									</li>
+								</ul>
+							</li>
+							<li class="nav-item" style="width: 30%">
+								<input type="text"  class="form-control" placeholder="Поиск по наименованию" v-model="searchQuery" />
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#" v-on:click="resetProductFilters">Сбросить фильтры</a>
+							</li>
+						</ul>
+						<button class="btn btn-primary" v-on:click="openCartModal" :disabled="orderItems.length === 0">
+							<i class="bi bi-cart"></i> 
+							Корзина
+							<span v-if="totalItemsInCart > 0" class="position-absolute start-100 translate-middle badge rounded-pill bg-danger" style="top: 5px !important">
+								{{ totalItemsInCart }}
+							</span>
+						</button>
+					</div>
+				</div>
+			</nav>
+			<div class="alert alert-warning mt-3" v-if="products.length == 0" role="alert">
+				В системе не найдено продуктов!
+			</div>
+			<div v-else class="row row-cols-3 row-cols-md-3 g-4 mb-4">
+				<div class="col" v-for="product in paginatedData" :key="product.id">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">Наименование: {{product.name}}</h5>
+							<h6 class="card-subtitle mb-2 text-body-secondary">Код товара: {{product.code}}</h6>
+							<p class="card-text">Категория: {{product.category}}</p>
+							<p class="card-text">Стоимость: {{product.price}}</p>
+							<div class="card-body d-flex justify-content-around align-items-center" style="height: 60px">
+								<div class="card-body input-group" style="width: 150px;">
+									<button class="btn btn-outline-dark minus" type="button" v-on:click="decreaseCount(product)">-</button>
+									<input type="text" class="form-control text-center count" min="0" :value="getProductCount(product.id)" readonly>
+									<button class="btn btn-outline-dark plus" type="button" v-on:click="increaseCount(product)">+</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="d-flex justify-content-between align-items-center" :class="{ 'd-none': paginatedData.length == 0 }">
+				<p class="me-auto">Страница {{ pageNumber + 1 }} из {{ pageCount }}</p>
+				<nav class="">
+					<ul class="pagination justify-content-center">
+						<li class="page-item" style="margin-right: 1rem">
+							<button class="btn btn-primary page-link" v-on:click="previousPage" :disabled="pageNumber === 0">Назад</button>
+						</li>
+						<li class="page-item">
+							<button class="btn btn-primary page-link" v-on:click="nextPage" :disabled="pageNumber >= pageCount - 1">Вперёд</button>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<!--Модальное окно корзины-->
+	<div class="modal fade" :class="{ 'show d-block': isCartModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Корзина</h5>
+					<button type="button" class="btn-close" v-on:click="closeCartModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<ul class="list-group list-group-horizontal" v-for="item in orderItems">
+						<li class="list-group-item w-75">Название: {{item.product.name}}</li>
+						<li class="list-group-item w-50">Количество: {{item.itemsCount}} шт.</li>
+						<li class="list-group-item list-group-item-action list-group-item-info" v-on:click="deleteCartItem(item.id)">Удалить из корзины</li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button v-if="orderItems.length != 0" type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="createOrder">Заказать</button>
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeCartModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isCartModalOpen, 'd-none': !isCartModalOpen }"></div>
+	<!--Модальное окно корзины-->
+
+	<!--Модальное окно оповещения-->
+	<div class="modal fade" :class="{ 'show d-block': isInfoModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Информация</h5>
+					<button type="button" class="btn-close" v-on:click="closeInfoModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					{{infoMessage}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeInfoModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isInfoModalOpen, 'd-none': !isInfoModalOpen }"></div>
+	<!--Модальное окно оповещения-->
+</div>
