@@ -3,6 +3,7 @@
 		return {
 			isInfoModalOpen: false,
 			isOrderEditModalOpen: false,
+			isCompleteModalOpen: false,
 			order: '',
 			message: '',
 			orders: [],
@@ -15,8 +16,6 @@
 	computed: {
 		tomorrowDate() {
 			const today = new Date();
-
-			// Вычисляем завтрашнюю дату
 			const tomorrow = new Date(today);
 			tomorrow.setDate(today.getDate() + 1);
 
@@ -83,6 +82,7 @@
 				});
 
 				this.closeOrderEditModal();
+				this.closeCompleteModal();
 
 				if (response.status != 200) {
 					this.openInfoModal(response.data != null || response.data != '' ? response.data : response);
@@ -126,6 +126,16 @@
 		closeOrderEditModal() {
 			this.order = '';
 			this.isOrderEditModalOpen = false;
+			this.getOrdersList();
+		},
+		openCompleteModal(id) {
+			this.message = `Подтвердить выполнение заказа ${id}`;
+			this.isCompleteModalOpen = true;
+		},
+		closeCompleteModal() {
+			this.order = '';
+			this.isCompleteModalOpen = false;
+			this.getOrdersList();
 		},
 	},
 	beforeMount() {

@@ -68,7 +68,7 @@
 							<td>
 								<div>
 									<button class="btn btn-info p-0" style="width: 32px; height:32px; margin-right: 10px;" :disabled="orderItem.status != 'Новый'" v-on:click="openOrderEditModal(orderItem)"><i class="bi-pencil"></i></button>
-									<button class="btn btn-info p-0" style="width: 32px; height:32px;" :disabled="orderItem.status != 'Выполняется'" v-on:click="order = orderItem; editOrder(1)"><i class="bi-check2-circle"></i></button>
+									<button class="btn btn-info p-0" style="width: 32px; height:32px;" :disabled="orderItem.status != 'Выполняется'" v-on:click="order = orderItem; openCompleteModal(orderItem.id)"><i class="bi-check2-circle"></i></button>
 								</div>
 							</td>
 						</tr>
@@ -151,4 +151,25 @@
 	</div>
 	<div class="modal-backdrop fade" :class="{ 'show': isInfoModalOpen, 'd-none': !isInfoModalOpen }"></div>
 	<!--Модальное окно оповещения-->
+
+	<!--Модальное окно подтверждение-->
+	<div class="modal fade" :class="{ 'show d-block': isCompleteModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Подтверждение</h5>
+					<button type="button" class="btn-close" v-on:click="closeCompleteModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					{{message}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="editOrder(1)">Подтвердить</button>
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeCompleteModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isCompleteModalOpen, 'd-none': !isCompleteModalOpen }"></div>
+	<!--Модальное окно подтверждение-->
 </div>
