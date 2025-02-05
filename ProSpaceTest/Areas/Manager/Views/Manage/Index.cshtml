@@ -1,0 +1,154 @@
+﻿@{
+	ViewData["Title"] = "Управление заказами";
+}
+
+
+@section Scripts {
+	<script src="/manager/scripts/order.manage.list.js" asp-append-version="true"></script>
+}
+
+<nav style="--bs-breadcrumb-divider: '>'" class="mt-2" aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">Дэшборд</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Заказы</li>
+	</ol>
+</nav>
+
+<div class="container p-0 mt-4" id="orders">
+	<div class="tab-content border p-1 active" style="padding: 0 2rem 0 2rem !important" id="myTabContent">
+		<div class="tab-pane fade show active" role="tabpanel" aria-labelledby="home-tab">
+			<div class="alert alert-info mt-3" v-if="orders.length == 0" role="alert">
+				В системе не найдено заказов!
+			</div>
+			<div v-else>
+				<nav class="navbar navbar-expand-lg mt-2">
+					<div class="container-fluid p-0">
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+								<li class="nav-item dropdown">
+									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+										Фильтрация по статусам
+									</a>
+									<ul class="dropdown-menu">
+										<li>
+											<a class="dropdown-item" href="#" v-on:click="selectedStatus = '' ">Все статусы</a>
+										</li>
+										<li v-for="status in statuses" :value="statuses">
+											<a class="dropdown-item" href="#" v-on:click="selectedStatus = status">{{status}}</a>
+										</li>
+									</ul>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#" v-on:click="resetOrderFilters">Сбросить фильтр</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</nav>
+				<div class="alert alert-info mt-3" v-if="paginatedData.length == 0" role="alert">
+					Не найдено заказов с выбранным статусом!
+				</div>
+				<table class="table" v-else>
+					<thead>
+						<tr>
+							<th scope="col">Id</th>
+							<th scope="col">Дата создания</th>
+							<th scope="col">Дата доставки</th>
+							<th scope="col">Статус</th>
+							<th scope="col">Действия</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="orderItem in paginatedData" :key="order.id">
+							<th scope="row">{{orderItem.id}}</th>
+							<td>{{orderItem.orderDate}}</td>
+							<td v-if="orderItem.shipmentDate == null">Не указана</td>
+							<td v-else>{{orderItem.shipmentDate}}</td>
+							<td>{{orderItem.status}}</td>
+							<td>
+								<div>
+									<button class="btn btn-info p-0" style="width: 32px; height:32px; margin-right: 10px;" :disabled="orderItem.status != 'Новый'" v-on:click="openOrderEditModal(orderItem)"><i class="bi-pencil"></i></button>
+									<button class="btn btn-info p-0" style="width: 32px; height:32px;" :disabled="orderItem.status != 'Выполняется'" v-on:click="order = orderItem; editOrder(1)"><i class="bi-check2-circle"></i></button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-between align-items-center" :class="{ 'd-none': paginatedData.length == 0 }">
+					<p class="me-auto">Страница {{ pageNumber + 1 }} из {{ pageCount }}</p>
+					<nav class="">
+						<ul class="pagination justify-content-center">
+							<li class="page-item" style="margin-right: 1rem">
+								<button class="btn btn-primary page-link" v-on:click="previousPage" :disabled="pageNumber == 0">Назад</button>
+							</li>
+							<li class="page-item">
+								<button class="btn btn-primary page-link" v-on:click="nextPage" :disabled="pageNumber >= pageCount - 1">Вперёд</button>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Модальное окно редактирования заказа-->
+	<div class="modal fade" :class="{ 'show d-block': isOrderEditModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Создание/редактирование продукта</h5>
+					<button type="button" class="btn-close" v-on:click="closeOrderEditModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="product-form">
+						@Html.AntiForgeryToken()
+						<div class="row g-2">
+							<label>Id заказа</label>
+							<div class="col-12">
+								<input id="id" v-model="order.id" type="text" class="form-control" aria-required="true" disabled />
+							</div>
+							<div class="col-12">
+								<input id="orderDate" v-model="order.orderDate" type="date" class="form-control" aria-required="true" disabled />
+							</div>
+							<div class="col-12">
+								<input id="shipmentDate" v-model="order.shipmentDate" :min="tomorrowDate" type="date" class="form-control" aria-required="true" />
+							</div>
+							<div class="col-12">
+								<select class="form-select" v-model="order.status">
+									<option value="Новый">Новый</option>
+									<option value="Выполняется">Выполняется</option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-secondary" v-on:click="editOrder(0)">Сохранить</button>
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeOrderEditModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isOrderEditModalOpen, 'd-none': !isOrderEditModalOpen }"></div>
+	<!--Модальное окно редактирования заказа-->
+
+	<!--Модальное окно оповещения-->
+	<div class="modal fade" :class="{ 'show d-block': isInfoModalOpen }" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 align="center" class="modal-title">Информация</h5>
+					<button type="button" class="btn-close" v-on:click="closeInfoModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					{{message}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary" v-on:click="closeInfoModal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade" :class="{ 'show': isInfoModalOpen, 'd-none': !isInfoModalOpen }"></div>
+	<!--Модальное окно оповещения-->
+</div>

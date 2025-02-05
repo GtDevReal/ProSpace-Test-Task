@@ -11,14 +11,18 @@
       ]
     },
     {
-      "library": "bootstrap-icons@1.11.3",
-      "destination": "wwwroot/lib/bootstrap-icons/"
-    },
-    {
       "library": "uuid@8.3.2",
       "destination": "wwwroot/lib/uuid/",
       "files": [
         "uuid.min.js"
+      ]
+    },
+    {
+      "library": "bootstrap-icons@1.11.3",
+      "destination": "wwwroot/lib/bootstrap-icons/",
+      "files": [
+        "font/fonts/bootstrap-icons.woff",
+        "font/fonts/bootstrap-icons.woff2"
       ]
     }
   ]

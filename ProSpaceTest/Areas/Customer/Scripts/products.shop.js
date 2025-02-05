@@ -21,14 +21,6 @@
 		}
 	},
 	computed: {
-		getCurrentDate() {
-			var today = new Date();
-			var dd = String(today.getDate()).padStart(2, '0');
-			var mm = String(today.getMonth() + 1).padStart(2, '0');
-			var yyyy = today.getFullYear();
-			today = dd + '.' + mm + '.' + yyyy;
-			return today
-		},
 		findMinPrice() {
 			if (this.filteredProducts.length === 0) return 0;
 			return Math.min(...this.filteredProducts.map(product => product.price));
@@ -60,7 +52,6 @@
 				);
 			}
 
-			// Сортировка
 			if (this.productFilters.sortBy) {
 				filtered.sort((a, b) => {
 					const valueA = a[this.productFilters.sortBy];
@@ -148,7 +139,9 @@
 					}
 				});
 				if (response.status != 200) {
-					this.openInfoModal(response.data != null ? response.data : response);
+					this.openInfoModal(response.data != null || response.data != '' ? response.data : response);
+					this.$forceUpdate();
+					return;
 				}
 
 				this.closeCartModal();
@@ -156,7 +149,7 @@
 				this.orderItems = [];
 			}
 			catch (e) {
-				this.openInfoModal(e.response.data != null ? e.response.data : e);
+				this.openInfoModal(e.response.data != null || e.response.data != '' ? e.response.data : e);
 			}
 		},
 		async getProductList() {
@@ -166,6 +159,8 @@
 
 				if (response.status != 200) {
 					this.products = [];
+					this.openInfoModal(response.data != null || response.data != '' ? response.data : response);
+					this.$forceUpdate();
 					return;
 				}
 
@@ -175,7 +170,7 @@
 			}
 			catch (e) {
 				this.products = [];
-				this.openInfoModal(e.response.data != null ? e.response.data : e);
+				this.openInfoModal(e.response.data != null || e.response.data != '' ? e.response.data : e);
 				this.$forceUpdate();
 			}
 		},
@@ -230,4 +225,4 @@
 		this.getProductList();
 	}
 })
-list.mount('#orders');
+list.mount('#ordersCreate');

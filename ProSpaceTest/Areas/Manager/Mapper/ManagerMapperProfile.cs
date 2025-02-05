@@ -11,6 +11,7 @@ namespace ProSpaceTest.Areas.Manager.Mapper
 			CreateMap<CustomerViewModel, CustomerEntity>().ReverseMap();
 			CreateMap<ProductViewModel, ProductEntity>().ReverseMap();
 			CreateMap<UsersViewModel, UsersEntity>().ReverseMap();
+			CreateMap<OrderViewModel, OrderEntity>().ReverseMap();
 		}
 	}
 }
