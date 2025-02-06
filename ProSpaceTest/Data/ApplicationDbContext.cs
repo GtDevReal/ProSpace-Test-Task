@@ -18,13 +18,6 @@ namespace ProSpaceTest.Data
 			Database.EnsureCreated();
 		}
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			var connString = "Host=localhost;Port=5432;Database=TestTask;Username=postgres;Password=admin";
-
-			optionsBuilder.UseNpgsql(connString);
-		}
-
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
